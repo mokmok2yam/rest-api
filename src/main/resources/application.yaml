@@ -1,6 +1,6 @@
 spring:
   application:
-    name: p-24-260305
+    name: rest-api
 
   profiles:
     active: dev
