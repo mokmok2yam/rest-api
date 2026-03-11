@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,14 +56,20 @@ public class ApiV1PostController {
 
     //글 등록
     @PostMapping
-    public RsData<PostWriteResBody> write(@RequestBody @Valid PostWriteReqBody reqBody) {
+    public ResponseEntity<RsData<PostWriteResBody>> write(@RequestBody @Valid PostWriteReqBody reqBody) {
         Post post = postService.write(reqBody.title, reqBody.content);
-        long postCount = postService.count();
-        return new RsData<>(
+        long postsCount = postService.count();
+
+        RsData<PostWriteResBody> rsData = new RsData<>(
                 "%d번 글이 성공적으로 작성되었습니다.".formatted(post.getId()),
                 "201-1",
-                new PostWriteResBody(new PostDto(post),postCount)
+                new PostWriteResBody(
+                        new PostDto(post),
+                        postsCount
+                )
         );
+
+        return ResponseEntity.status(201).body(rsData);
     }
     //글 삭제
     @DeleteMapping("/{id}")
