@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +29,7 @@ public class ApiV1PostController {
                 .toList();
         return postDtoList;
     }
+
     //단건 조회
     @GetMapping("/{id}")
     @ResponseBody
@@ -37,6 +37,7 @@ public class ApiV1PostController {
         Post post = postService.findById(id).get();
         return new PostDto(post);
     }
+
     //글등록 요청 dto
     record PostWriteReqBody(
             @Size(min = 2, max = 10, message = "03-title-제목은 2자 이상 10자 이하로 입력해주세요.")
@@ -46,21 +47,23 @@ public class ApiV1PostController {
             @NotBlank(message = "02-content-내용은 필수입니다.")
             @Size(min = 2, max = 100, message = "04-content-내용은 2자 이상 100자 이하로 입력해주세요.")
             String content
-    ){}
+    ) {
+    }
+
     //글 등록 응답 dtd
     record PostWriteResBody(
             PostDto postDto,
             long postCount
-    ){
+    ) {
     }
 
     //글 등록
     @PostMapping
-    public ResponseEntity<RsData<PostWriteResBody>> write(@RequestBody @Valid PostWriteReqBody reqBody) {
+    public RsData<PostWriteResBody> write(@RequestBody @Valid PostWriteReqBody reqBody) {
         Post post = postService.write(reqBody.title, reqBody.content);
         long postsCount = postService.count();
 
-        RsData<PostWriteResBody> rsData = new RsData<>(
+        return new RsData<>(
                 "%d번 글이 성공적으로 작성되었습니다.".formatted(post.getId()),
                 "201-1",
                 new PostWriteResBody(
@@ -68,9 +71,8 @@ public class ApiV1PostController {
                         postsCount
                 )
         );
-
-        return ResponseEntity.status(201).body(rsData);
     }
+
     //글 삭제
     @DeleteMapping("/{id}")
     @ResponseBody
