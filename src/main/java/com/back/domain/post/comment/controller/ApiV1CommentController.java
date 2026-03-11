@@ -4,6 +4,7 @@ import com.back.domain.post.comment.entity.Comment;
 import com.back.domain.post.comment.entity.CommentDto;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
+import com.back.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("api/v1/posts/{postId}/comments")
@@ -48,17 +48,13 @@ public class ApiV1CommentController {
     @GetMapping("/{commentId}/delete")
     @ResponseBody
     @Transactional
-    public Map<String,Object> delete(
+    public RsData delete(
             @PathVariable int postId,
             @PathVariable int commentId
     ) {
         Post post = postService.findById(postId).get();
         post.deleteComment(commentId);
-        Map<String, Object> result = Map.of(
-                "resultCode","204-1",
-                "message","%d번 댓글이 삭제되었습니다.".formatted(commentId)
-        );
-        return result;
+        return new RsData("%d 댓글이 삭제되었습니다.".formatted(commentId),"204-1");
     }
 
 

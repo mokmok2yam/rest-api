@@ -28,7 +28,6 @@ public class ApiV1PostController {
                 .toList();
         return postDtoList;
     }
-
     //단건 조회
     @GetMapping("/{id}")
     @ResponseBody
