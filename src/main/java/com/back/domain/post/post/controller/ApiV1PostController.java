@@ -21,9 +21,7 @@ public class ApiV1PostController {
     public List<PostDto> list() {
         List<Post> result = postService.findAll();
         List<PostDto> postDtoList = result.stream()
-                .map(p -> {
-                    return new PostDto(p.getId(), p.getTitle(), p.getContent(), p.getCreateDate(), p.getModifyDate());
-                })
+                .map(PostDto::new)
                 .toList();
         return postDtoList;
     }

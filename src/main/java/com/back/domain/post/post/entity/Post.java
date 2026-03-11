@@ -61,5 +61,4 @@ public class Post extends BaseEntity {
         comments.remove(comment);
     }
 
-    // 댓글 수정
 }
