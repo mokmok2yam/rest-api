@@ -8,13 +8,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
 public class ApiV1PostController {
@@ -37,7 +36,8 @@ public class ApiV1PostController {
         Post post = postService.findById(id).get();
         return new PostDto(post);
     }
-    record postWriteReqBody(
+    //글등록 요청 dto
+    record PostWriteReqBody(
             @Size(min = 2, max = 10, message = "03-title-제목은 2자 이상 10자 이하로 입력해주세요.")
             @NotBlank(message = "01-title-제목은 필수입니다.")
             String title,
@@ -46,15 +46,22 @@ public class ApiV1PostController {
             @Size(min = 2, max = 100, message = "04-content-내용은 2자 이상 100자 이하로 입력해주세요.")
             String content
     ){}
+    //글 등록 응답 dtd
+    record PostWriteResBody(
+            PostDto postDto,
+            long postCount
+    ){
+    }
 
+    //글 등록
     @PostMapping
-    public RsData<PostDto> write(@RequestBody @Valid postWriteReqBody reqBody) {
+    public RsData<PostWriteResBody> write(@RequestBody @Valid PostWriteReqBody reqBody) {
         Post post = postService.write(reqBody.title, reqBody.content);
-
+        long postCount = postService.count();
         return new RsData<>(
                 "%d번 글이 성공적으로 작성되었습니다.".formatted(post.getId()),
                 "201-1",
-                new PostDto(post)
+                new PostWriteResBody(new PostDto(post),postCount)
         );
     }
     //글 삭제
