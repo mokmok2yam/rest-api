@@ -79,7 +79,7 @@ public class ApiV1CommentController {
         Comment comment=post.addComment(reqBody.content());
         postService.flush();
         return new RsData<>(
-                "%d번 댓글이 성공적으로 작성되었습니다.".formatted(post.getId()),
+                "%d번 댓글이 성공적으로 작성되었습니다.".formatted(comment.getId()),
                 "201-1",
                 new CommentWriteResBody(
                         new CommentDto(comment)
