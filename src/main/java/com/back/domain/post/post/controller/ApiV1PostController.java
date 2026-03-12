@@ -23,7 +23,7 @@ public class ApiV1PostController {
     @GetMapping()
     @ResponseBody
     public List<PostDto> list() {
-        List<Post> result = postService.findAll();
+        List<Post> result = postService.findAll().reversed();
         List<PostDto> postDtoList = result.stream()
                 .map(PostDto::new)
                 .toList();
