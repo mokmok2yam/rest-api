@@ -109,7 +109,7 @@ public class ApiV1PostController {
     //글 수정 api 구현
     @Transactional
     @PutMapping({"/{id}"})
-    public RsData<PostModifyResBody> write(
+    public RsData<PostModifyResBody> modify(
             @PathVariable int id,
             @RequestBody @Valid PostModifyReqBody reqBody) {
         Post post = postService.modify(id, reqBody.title, reqBody.content);
