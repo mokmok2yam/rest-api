@@ -42,5 +42,9 @@ public class PostService {
         List<Post>result = postRepository.findAll();
         return result;
     }
+    public void flush(){
+        postRepository.flush();
+    }
+
 }
 
