@@ -55,6 +55,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$[0].title").value("제목3"))
                 .andExpect(jsonPath("$[0].content").value("내용3"));
     }
+
     @Test
     @DisplayName("글 단건 조회")
     void t2() throws Exception {
@@ -102,7 +103,14 @@ public class ApiV1PostControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(status().isCreated());
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("write"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.postDto.id").value(4))
+                .andExpect(jsonPath("$.data.postDto.createDate").exists())
+                .andExpect(jsonPath("$.data.postDto.modifyDate").exists())
+                .andExpect(jsonPath("$.data.postDto.title").value(title))
+                .andExpect(jsonPath("$.data.postDto.content").value(content));
     }
 
     @Test
