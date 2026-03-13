@@ -33,27 +33,36 @@ public class Post extends BaseEntity {
         this.title = title;
         this.content = content;
     }
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
     }
+
     // 댓글 추가
+
     public Comment addComment(String content) {
         Comment comment = new Comment(content, this);
         comments.add(comment);
 
         return comment;
     }
+
     // 댓글 조회
     public Optional<Comment> findCommentById(int commentId) {
         return comments.stream()
                 .filter(c -> c.getId() == commentId)
                 .findFirst();
     }
+
     // 댓글 삭제
     public void deleteComment(int id) {
         Comment comment = findCommentById(id).get();
         comments.remove(comment);
     }
 
+    public void modifyComment(int commentId, String content) {
+        Comment comment = findCommentById(commentId).get();
+        comment.update(content);
+    }
 }

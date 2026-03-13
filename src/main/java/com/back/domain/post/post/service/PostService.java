@@ -39,12 +39,11 @@ public class PostService {
     }
 
     public List<Post> findAll() {
-        List<Post>result = postRepository.findAll();
-        return result;
-    }
-    public void flush(){
-        postRepository.flush();
+        return postRepository.findAll();
     }
 
+    public void flush() {
+        postRepository.flush();
+    }
 }
 

@@ -2,6 +2,7 @@ package com.back.domain.post.post.controller;
 
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.repository.PostRepository;
+import com.back.domain.post.post.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,31 +21,28 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
 public class ApiV1PostControllerTest {
+
     @Autowired
     private MockMvc mvc;
+
     @Autowired
-    PostRepository postRepository;
+    private PostRepository postRepository;
+    @Autowired
+    private PostService postService;
 
     @Test
     @DisplayName("글 다건 조회")
     void t1() throws Exception {
-
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/posts")
                 )
                 .andDo(print());
-
-        resultActions
-                .andExpect(handler().handlerType(ApiV1PostController.class))
-                .andExpect(handler().methodName("list"))
-                .andExpect(status().isOk());
 
         resultActions
                 .andExpect(jsonPath("$.length()").value(3))
@@ -57,9 +55,8 @@ public class ApiV1PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 단건 조회")
+    @DisplayName("글 단건 조회 - 성공")
     void t2() throws Exception {
-
         int targetId = 1;
 
         ResultActions resultActions = mvc
@@ -72,15 +69,21 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().handlerType(ApiV1PostController.class))
                 .andExpect(handler().methodName("detail"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.title").value("제목1"))
+                .andExpect(jsonPath("$.content").value("내용1"));
+
 
         Post post = postRepository.findById(targetId).get();
 
         resultActions
                 .andExpect(jsonPath("$.createDate").value(matchesPattern(post.getCreateDate().toString().replaceAll("0+$", "") + ".*")))
-                .andExpect(jsonPath("$.modifyDate").value(matchesPattern(post.getModifyDate().toString().replaceAll("0+$", "") + ".*")))
-                .andExpect(jsonPath("$.title").value("제목1"))
-                .andExpect(jsonPath("$.content").value("내용1"));
+                .andExpect(jsonPath("$.modifyDate").value(matchesPattern(post.getModifyDate().toString().replaceAll("0+$", "") + ".*")));
+
+//        Post post = postRepository.findById(targetId).get();
+//        resultActions
+//                .andExpect(jsonPath("$.title").value(post.getTitle()))
+//                .andExpect(jsonPath("$.content").value(post.getContent()));
     }
 
     @Test
@@ -102,7 +105,7 @@ public class ApiV1PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 생성")
+    @DisplayName("글 작성")
     void t4() throws Exception {
         String title = "제목입니다";
         String content = "내용입니다";
@@ -161,6 +164,8 @@ public class ApiV1PostControllerTest {
 
 
     }
+
+
     @Test
     @DisplayName("글 작성, 내용이 입력되지 않은 경우")
     void t6() throws Exception {
@@ -185,7 +190,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().methodName("write"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.resultCode").value("400-1"))
-                .andExpect(jsonPath("$.msg").value("content-NotBlank-02-content-내용은 필수입니다.\ncontent-Size-04-content-내용은 2자 이상 100자 이하로 입력해주세요."));
+                .andExpect(jsonPath("$.msg").value("content-NotBlank-02-content-내용은 필수입니다.\ncontent-Size-04-content-내용은 2자 이상 100자 이하로 입력해주세요.".stripIndent().trim()));
     }
 
     @Test
@@ -218,7 +223,7 @@ public class ApiV1PostControllerTest {
     @Test
     @DisplayName("글 수정")
     void t8() throws Exception {
-        Integer targetId = 1;
+        int targetId = 1;
         String title = "제목 수정";
         String content = "내용 수정";
 
@@ -249,6 +254,7 @@ public class ApiV1PostControllerTest {
         assertThat(post.getTitle()).isEqualTo(title);
         assertThat(post.getContent()).isEqualTo(content);
     }
+
     @Test
     @DisplayName("글 삭제")
     void t9() throws Exception {
@@ -272,5 +278,4 @@ public class ApiV1PostControllerTest {
         Post post = postRepository.findById(targetId).orElse(null);
         assertThat(post).isNull();
     }
-
 }

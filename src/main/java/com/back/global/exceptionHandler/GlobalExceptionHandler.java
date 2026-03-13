@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
                 "404-1"
         );
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public RsData<Void> handleException(MethodArgumentNotValidException e) {

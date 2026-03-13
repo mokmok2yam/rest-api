@@ -36,15 +36,18 @@ public class ResponseAspect {
             @annotation(org.springframework.web.bind.annotation.ResponseBody)
             """)
     public Object responseAspect(ProceedingJoinPoint joinPoint) throws Throwable {
-        //전처리
+
+
+        System.out.println("ResponseAspec 전처리");
 
         Object rst = joinPoint.proceed(); // 실제 수행 메서드
-        //후처리
 
+        System.out.println("ResponseAspec 후처리");
         if(rst instanceof RsData rsData) {
             int statusCode = rsData.getStatusCode();
             response.setStatus(statusCode);
         }
+
         return rst;
     }
 

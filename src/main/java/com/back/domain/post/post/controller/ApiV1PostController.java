@@ -17,28 +17,27 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
 public class ApiV1PostController {
+
     private final PostService postService;
 
-    //게시굴 목록 받기
-    @GetMapping()
-    @ResponseBody
+    @GetMapping
     public List<PostDto> list() {
-        List<Post> result = postService.findAll().reversed();
-        List<PostDto> postDtoList = result.stream()
+        List<Post> result = postService.findAll();
+
+        List<PostDto> postDtoList = result.reversed().stream()
                 .map(PostDto::new)
                 .toList();
+
         return postDtoList;
     }
 
-    //단건 조회
     @GetMapping("/{id}")
-    @ResponseBody
     public PostDto detail(@PathVariable int id) {
+
         Post post = postService.findById(id).get();
         return new PostDto(post);
     }
 
-    //글등록 요청 dto
     record PostWriteReqBody(
             @Size(min = 2, max = 10, message = "03-title-제목은 2자 이상 10자 이하로 입력해주세요.")
             @NotBlank(message = "01-title-제목은 필수입니다.")
@@ -50,14 +49,12 @@ public class ApiV1PostController {
     ) {
     }
 
-    //글 등록 응답 dtd
     record PostWriteResBody(
             PostDto postDto,
-            long postCount
+            long postsCount
     ) {
     }
 
-    //글 등록
     @PostMapping
     public RsData<PostWriteResBody> write(@RequestBody @Valid PostWriteReqBody reqBody) {
         Post post = postService.write(reqBody.title, reqBody.content);
@@ -73,22 +70,7 @@ public class ApiV1PostController {
         );
     }
 
-    //글 삭제
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    @Transactional
-    public RsData<Void> delete(
-            @PathVariable int id
-    ) {
-        Post post = postService.findById(id).get();
-        postService.deleteById(id);
-        return new RsData<>(
-                "%d번 게시물이 삭제되었습니다.".formatted(id),
-                "200-1"
-        );
-    }
 
-    //글수정요청 dto
     record PostModifyReqBody(
             @Size(min = 2, max = 10, message = "03-title-제목은 2자 이상 10자 이하로 입력해주세요.")
             @NotBlank(message = "01-title-제목은 필수입니다.")
@@ -100,25 +82,39 @@ public class ApiV1PostController {
     ) {
     }
 
-    //글 수정 응답 dtd
     record PostModifyResBody(
             PostDto postDto
     ) {
     }
 
-    //글 수정 api 구현
+    @PutMapping("/{id}")
     @Transactional
-    @PutMapping({"/{id}"})
     public RsData<PostModifyResBody> modify(
             @PathVariable int id,
-            @RequestBody @Valid PostModifyReqBody reqBody) {
+            @RequestBody @Valid PostModifyReqBody reqBody
+    ) {
+
         Post post = postService.modify(id, reqBody.title, reqBody.content);
+
         return new RsData<>(
                 "%d번 게시물이 수정되었습니다.".formatted(post.getId()),
                 "200-1",
                 new PostModifyResBody(
                         new PostDto(post)
                 )
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public RsData<Void> delete(
+            @PathVariable int id
+    ) {
+
+        postService.deleteById(id);
+
+        return new RsData<>(
+                "%d번 게시물이 삭제되었습니다.".formatted(id),
+                "200-1"
         );
     }
 }
